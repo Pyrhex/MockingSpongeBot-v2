@@ -13,9 +13,6 @@ from discord.commands import SlashCommandGroup
 # Keep in mind that the command name will be derived from the class name
 # but in lowercase
 savefile = "/Users/brian/Documents/MockingSpongeBot-v2/files/groceries.json"
-if os.path.exists(savefile) == True:
-    with open(savefile, "r") as f:
-        groceries = json.load(f)
 # So, a command class named Random will generate a 'random' command
 class Gro(commands.Cog):
 
@@ -321,6 +318,9 @@ class Gro(commands.Cog):
                         f.write(jsonfile)
     @gro.command()
     async def clear(self, ctx, listname):
+        if os.path.exists(savefile) == True:
+            with open(savefile, "r") as f:
+                groceries = json.load(f)
         if listname == "all":
             for i in list(groceries.keys()):
                 groceries[i] = []
@@ -341,6 +341,9 @@ class Gro(commands.Cog):
                 f.write(jsonfile)
     @gro.command()
     async def new(self, ctx, listname):
+        if os.path.exists(savefile) == True:
+            with open(savefile, "r") as f:
+                groceries = json.load(f)
         groceries[listname] = []
 
         jsonfile = json.dumps(groceries, indent = 4)
@@ -350,6 +353,9 @@ class Gro(commands.Cog):
 
     @gro.command()
     async def add(self, ctx, listname, item):
+        if os.path.exists(savefile) == True:
+            with open(savefile, "r") as f:
+                groceries = json.load(f)
         if listname not in ["all"] + list(groceries.keys()):
             groceries[listname] = []
         if item != "":
@@ -374,6 +380,9 @@ class Gro(commands.Cog):
             await ctx.respond(f"Missing item to be added.")
     @gro.command()
     async def list(self, ctx, listname=''):
+        if os.path.exists(savefile) == True:
+            with open(savefile, "r") as f:
+                groceries = json.load(f)
         if listname == "all" or listname == "":
             if len(groceries) > 0:
                 msg = []
@@ -390,12 +399,6 @@ class Gro(commands.Cog):
                         chunk = f":shopping_cart: **{i}**\n\t*No groceries.*"
                         msg.append(chunk)
                 text = '\n\n'.join(msg)
-
-                # change this to edit the last 'list' command made
-                # shop_ch = client.get_channel(1032804856135688302)
-                # msg_id = 1062250044360765499
-                # pinned_msg = await shop_ch.fetch_message(msg_id)
-                # await pinned_msg.edit(content=text) # why does the edit not show up until the next time !gro list is enacted?
                 await ctx.respond(text)
             else:
                 await ctx.respond("You have no grocery lists.")
@@ -412,10 +415,6 @@ class Gro(commands.Cog):
                 items.append(f"\t{idx : >2}. {i.capitalize()}")
             msg.extend(items)
             text = '\n'.join(msg)
-            # shop_ch = client.get_channel(1032804856135688302)
-            # msg_id = 1062250044360765499
-            # pinned_msg = await shop_ch.fetch_message(msg_id)
-            # await pinned_msg.edit(content=text)
             await ctx.respond(text) 
 def setup(bot):
     bot.add_cog(Gro(bot))
