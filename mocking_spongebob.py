@@ -20,7 +20,7 @@ async def on_ready():
     print(bot.user.name) 
     print(bot.user.id)
     print('------')
-
+    await bot.change_presence(activity=discord.Game(name="SHEEEEEEEESH"))
 for filename in os.listdir("./commands"):
     if filename.endswith(".py"):
         bot.load_extension(f"commands.{filename[:-3]}")
