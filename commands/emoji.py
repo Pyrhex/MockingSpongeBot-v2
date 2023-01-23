@@ -73,7 +73,7 @@ class Emoji(commands.Cog):
                 emoji = ":regional_indicator_" + i.lower() + ": "
                 text = text.replace(i, emoji)
 
-        text = text.replace("|", "||").replace(":exclamation: :exclamation:", ":bangbang:").replace(":exclamation: :question:", ":interrobang:")
+        text = text.replace("|", "||||").replace(":exclamation: :exclamation:", ":bangbang:").replace(":exclamation: :question:", ":interrobang:")
         await ctx.respond(text)
     
 # class Shrek(commands.Cog):
