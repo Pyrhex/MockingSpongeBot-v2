@@ -1,2 +1,3 @@
 discordToken.txt
 commands/__pycache__/*
+.DS_Store
