@@ -416,5 +416,70 @@ class Gro(commands.Cog):
             msg.extend(items)
             text = '\n'.join(msg)
             await ctx.respond(text) 
+    @gro.command()
+    async def remove(self, ctx, listname, item):
+        if os.path.exists(savefile) == True:
+            with open(savefile, "r") as f:
+                groceries = json.load(f)
+        # if the sublist is not in the grocery keys, check if that arg is a number after splitting by commas
+        if listname not in list(groceries.keys()):
+            indices = listname.replace(", ", ",").split(",")
+            try:
+                # if the first item can be converted into an int, means that it was intended as the indices number and the list is missing
+                x = int(indices[0])
+                await ctx.respond(f"Missing list argument.")
+            except ValueError as ve:
+                # if indices cannot be converted into int and is empty string, then the list arg is missing entirely
+                if indices[0] == "":
+                    await ctx.respond(f"Missing list argument.")
+                # if indices is still a string, then it means the list given unrecognized
+                else:
+                    await ctx.respond(f"Unrecognized list: **{listname}**")
+        else:
+            # the list is valid, and the item is slot is not empty
+            if item != "":
+                # assume that multiple indices are given
+                indices = item.replace(", ", ",").split(",")
+                # create a copy of the grocery list to retain the indices
+                copy = groceries[listname].copy()
+                removed = []
+                # for each indices
+                for i in indices:
+                    try:
+                        # if indices is an int
+                        index = int(i)
+                        # then check if its in range of the available indices (+1 since python iz zero based) 
+                        if index not in range(1, len(copy)+1):
+                            await ctx.respond("Unrecognized index: *{index}*")
+                        else:
+                            item = copy[index-1] # get item from original list
+                            idx = groceries[listname].index(item) # get new index from new list using original item
+                            temp = groceries[listname].pop(idx) # use the new index to pop 
+                            removed.append(item)
+                            # await ctx.respond(f"Removed *{item}* from **{listname}**.")
+                    except ValueError as ve:
+                        # if the indices is actually an item itself
+                        if i not in groceries[listname]:
+                            await ctx.respond(f"Unrecognized item: *{i}*")
+                        else:
+                            # remove using name
+                            groceries[listname].remove(i)
+                            removed.append(i)
+                            # await ctx.respond(f"Removed *{item}* from **{listname}**.")
+                text = ", ".join(removed)
+                await ctx.respond(f"Removed *{text}* from **{listname}**.")
+                msg = [ f":shopping_cart: **{listname}**" ]
+                items = []
+                for index, i in enumerate(groceries[listname]):
+                    idx = index+1
+                    items.append(f"\t{idx : >2}. {i.capitalize()}")
+                msg.extend(items)
+                text = '\n'.join(msg)
+                await ctx.respond(":warning: This message will self-destruct in 5 seconds :warning:\n\n" + text, delete_after = 5) 
+                jsonfile = json.dumps(groceries, indent = 4)
+                with open(savefile, "w") as f:
+                    f.write(jsonfile)
+            else:
+                await ctx.respond(f"Missing item to be removed.")
 def setup(bot):
     bot.add_cog(Gro(bot))
