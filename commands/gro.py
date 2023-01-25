@@ -481,5 +481,61 @@ class Gro(commands.Cog):
                     f.write(jsonfile)
             else:
                 await ctx.respond(f"Missing item to be removed.")
+
+    @gro.command()
+    async def edit(self, ctx, listname, item):
+        if sublist not in list(groceries.keys()):
+            if sublist == "":
+                await ctx.respond(f"Unrecognized list: **{sublist}**")
+            else:
+                await ctx.respond("Missing list argument.")
+        else:
+            if item != "":
+                string = item.split()
+                try:
+                    # SPLIT BACK TO individual
+                    index = int(string[0])
+                    if index not in range(1, len(groceries[sublist])+1):
+                        await ctx.respond("Unrecognized index: *{index}*")
+                    else:
+                        if subcommand == "edit":
+                            new_item = " ".join(string[1:])
+                            old_item = groceries[sublist][index-1] 
+                            groceries[sublist][index-1] = new_item
+                            await ctx.respond(f"Edited *{old_item}* to *{new_item}* in **{sublist}**.")
+
+
+                            msg = [ f":shopping_cart: **{sublist}**" ]
+                            items = []
+                            for index, i in enumerate(groceries[sublist]):
+                                idx = index+1
+                                items.append(f"\t{idx : >2}. {i.capitalize()}")
+                            msg.extend(items)
+                            text = '\n'.join(msg)
+                            await ctx.respond(":warning: This message will self-destruct in 5 seconds :warning:\n\n" + text, delete_after = 5) 
+
+                            jsonfile = json.dumps(groceries, indent = 4)
+                            with open(savefile, "w") as f:
+                                f.write(jsonfile)
+                        elif subcommand == "append":
+                            old_item = groceries[sublist][index-1] 
+                            new_item = " ".join(string[1:])
+                            groceries[sublist][index-1] = old_item + " " + new_item
+                            await ctx.respond(f"Appended *{new_item}* to *{old_item}* in **{sublist}**.")
+                            msg = [ f":shopping_cart: **{sublist}**" ]
+                            items = []
+                            for index, i in enumerate(groceries[sublist]):
+                                idx = index+1
+                                items.append(f"\t{idx : >2}. {i.capitalize()}")
+                            msg.extend(items)
+                            text = '\n'.join(msg)
+                            await ctx.respond(":warning: This message will self-destruct in 5 seconds :warning:\n\n" + text, delete_after = 5) 
+                            jsonfile = json.dumps(groceries, indent = 4)
+                            with open(savefile, "w") as f:
+                                f.write(jsonfile)
+                except ValueError as ve:
+                    await ctx.respond(f"First item must be an index: {string[0]}")
+            else:
+                await ctx.respond(f"Missing item to {subcommand}.")
 def setup(bot):
     bot.add_cog(Gro(bot))
