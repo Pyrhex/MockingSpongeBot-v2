@@ -3,7 +3,7 @@ import os.path
 from discord.ext import commands
 from discord.commands import slash_command
 from discord.commands import SlashCommandGroup
-
+from discord.commands import option
 # Your friendly example event
 # Keep in mind that the command name will be derived from the class name
 # but in lowercase
@@ -383,6 +383,8 @@ class Gro(commands.Cog):
         if os.path.exists(savefile) == True:
             with open(savefile, "r") as f:
                 groceries = json.load(f)
+        print(groceries)
+        print(type(groceries))
         if listname == "all" or listname == "":
             if len(groceries) > 0:
                 msg = []
@@ -416,7 +418,14 @@ class Gro(commands.Cog):
             msg.extend(items)
             text = '\n'.join(msg)
             await ctx.respond(text) 
+    async def get_item(ctx):
+        picked_list= ctx.options["listname"]
+        if os.path.exists(savefile) == True:
+            with open(savefile, "r") as f:
+                groceries = json.load(f)
+        return groceries[picked_list]
     @gro.command()
+    @option("item", description="The item you want to remove", required=True, autocomplete=get_item)
     async def remove(self, ctx, listname, item):
         if os.path.exists(savefile) == True:
             with open(savefile, "r") as f:
