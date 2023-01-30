@@ -423,7 +423,7 @@ class Gro(commands.Cog):
         if os.path.exists(savefile) == True:
             with open(savefile, "r") as f:
                 groceries = json.load(f)
-        return groceries[picked_list]
+        return [item for item in groceries[picked_list] if item.startswith(ctx.value)]
     @gro.command()
     @option("item", description="The item you want to remove", required=True, autocomplete=get_item)
     async def remove(self, ctx, listname, item):
